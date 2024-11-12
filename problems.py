@@ -1,10 +1,11 @@
 import numpy as np
 
+
 class Problem():
     def __init__(self, n=0, l=0, m=0, fopt=np.nan):
-        self.n = n
-        self.l = l
-        self.m = m
+        self.n = n  # problem dimension
+        self.l = l  # inequality dimension
+        self.m = m  # equality dimension
         self.fopt = fopt
 
     def f(self, x):
@@ -12,19 +13,41 @@ class Problem():
 
     def g(self, x):
         if self.l == 0:
-            return np.empty((0, 0))
+            return np.empty((0, 1))
         else:
             raise NotImplementedError
 
     def h(self, x):
         if self.m == 0:
-            return np.empty((0, 0))
+            return np.empty((0, 1))
         else:
             raise NotImplementedError
+
+    # ------------------------------------------------------------------------------
+    # Convenience functions for when (eg. with pycma) X will be passed as a flat np.array
+    def f_flat(self, x):
+        return self.f(np.vstack(x))
+    def g_flat(self, x):
+        return self.g(np.vstack(x))
+    def h_flat(self, x):
+        return self.h(np.vstack(x))
+    def gh_flat(self, x):
+        return self.gh(np.vstack(x))
+    # ------------------------------------------------------------------------------
 
     def unpack(self):
         # n, l, m, f, g, h,
         return self.n, self.l, self.m, self.f, self.g, self.h
+
+    def gh(self, x):
+        return np.vstack((
+            self.g(x),
+            self.h(x),
+        ))
+
+    @property
+    def equality(self):
+        return np.array([0] * self.l + [1] * self.m, dtype=bool)
 
 
 class g03(Problem):
@@ -81,7 +104,7 @@ class g04(Problem):
         return np.vstack(v)
 
     def f(self, x):
-        5.3578547 * x[2] ** 2 + 0.8356891 * x[0] * x[4] + 37.293239 * x[0] - 40792.141
+        return 5.3578547 * x[2] ** 2 + 0.8356891 * x[0] * x[4] + 37.293239 * x[0] - 40792.141
 
 
 
@@ -110,7 +133,7 @@ class g05(Problem):
         return np.vstack(v)
 
     def h(self, x):
-        v = np.zeros(self.l)
+        v = np.zeros(self.m)
 
         v[0] = 1000 * np.sin(-x[2] - 0.25) + 1000 * np.sin(-x[3] - 0.25) + 894.8 - x[0]
         v[1] = 1000 * np.sin(x[2] - 0.25) + 1000 * np.sin(x[2] - x[3] - 0.25) + 894.8 - x[1]
