@@ -52,7 +52,7 @@ class Problem():
 
 class g03(Problem):
     def __init__(self):
-        super().__init__(n=10, l=20, m=1, fopt=-1.00050010001000)
+        super().__init__(n=10, l=20, m=1, fopt=-1.0)  # 0050010001000
 
     def f(self, x):
         return -10**5 * np.prod(x)
@@ -288,19 +288,17 @@ class g11(Problem):
     def g(self, x):
         v = np.zeros(self.l)
 
-        v[0] = x[1] - x[0] ** 2
-
-        v[1] = -1 - x[0]
-        v[2] = x[0] - 1
-        v[3] = -1 - x[1]
-        v[4] = x[1] - 1
+        v[0] = -1 - x[0]
+        v[1] = x[0] - 1
+        v[2] = -1 - x[1]
+        v[3] = x[1] - 1
 
         return np.vstack(v)
 
     def h(self, x):
         v = np.zeros(self.m)
 
-        v[0] = -(x[1] - x[0] ** 2)
+        v[0] = (x[1] - x[0] ** 2)
 
         return np.vstack(v)
 
